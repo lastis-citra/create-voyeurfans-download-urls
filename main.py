@@ -2,6 +2,16 @@ import requests
 from bs4 import BeautifulSoup
 
 
+# safedl.netはリダイレクトが入るので，リダイレクト先のURLを知りたい
+def get_safedl_redirect_url(url):
+    res = requests.get(url)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    a_tags = soup.select('a')
+    for a in a_tags:
+        url = a['href']
+        print(url)
+
+
 # 検索結果ページから次の検索結果ページを取得する
 def get_next_page(soup):
     a_tags = soup.select('a[rel=next]')
@@ -24,8 +34,11 @@ def get_search_result_urls(url):
     a_tags = soup.select('blockquote a')
     for a in a_tags:
         url = a['href']
-        if 'uploaded.net' in url or 'ul.to' in url:
-            print(url)
+        if 'safedl.net' in url or 'ul.to' in url:
+            if 'safedl.net' in url:
+                get_safedl_redirect_url(url)
+            else:
+                print(url)
     next_url = get_next_page(soup)
     # print(next_url)
 
